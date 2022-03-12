@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script type="text/javascript" src="script.js"></script>
+</head>
+
+<body>
+    <div id="container" class="container">
+        <div class="row mt-3" style="height: 480;">
+            <div id="canvas" class="col-12 col-lg-8">
+                <img style="position: fixed;" src="/img/img.png" class="rounded" />
+                <canvas id="paint" style="position: fixed;" class="rounded"></canvas>
+            </div>
+            <div class="col-4" id="batimentosContainer">
+                <div class="alert alert-warning w-100 text-center"  id="batimentos"/>
+            </div>
+            <!-- <input type="number" id="freq"> -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const timer = (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms))
+        } 
+
+        // var clock = 0
+        // const trackClock = async () =>{
+        //     while(true){
+        //         await timer(1000)
+        //         clock = clock+1
+        //         console.log(clock)
+        //     }
+        // }
+        // trackClock()
+
+        var y = 240
+        var _y = 240
+
+        const handleMousemove = (event) => {
+            _y = y 
+            y = event.y
+        }
+        
+        const canvas = document.getElementById('paint')
+        canvas.height = 480
+        canvas.width = 720
+
+        const contexto = canvas.getContext('2d') 
+        
+        document.addEventListener('mousemove', handleMousemove)
+
+        const app = async () =>{
+            while(true){
+                draw(y)
+                detectBatimento(y)
+                await timer(0.1)
+            }
+        }
+
+        const draw = (y) =>{
+            contexto.lineWidth = 3
+            contexto.strokeStyle = "#ccff99"
+
+            // TRANSPOR A IMAGEM PRA CRIAR EFEITO DE MOVIMENTO
+            const imageData = contexto.getImageData(1, 0, contexto.canvas.width-1, contexto.canvas.height)
+            contexto.putImageData(imageData, 0, 0)
+            contexto.clearRect(contexto.canvas.width-1, 0, 1, contexto.canvas.height)
+
+            contexto.beginPath()
+            contexto.moveTo(canvas.width/2, _y)
+            contexto.lineTo(canvas.width/2, y)
+            contexto.stroke()
+        }
+
+        const detectBatimento = (y) =>{
+            const elemento = document.getElementById('batimentos')
+
+            if(480-y > 240){
+                elemento.innerHTML = 'BATIMENTO DETECTADO'
+                elemento.classList.remove('alert-warning')
+                elemento.classList.add('alert-success')
+
+                // const novoElemento = document.createElement('P')
+                // novoElemento.innerHTML = 'teste'
+                // document.getElementById('batimentosContainer').appendChild(novoElemento)
+            } else {
+                elemento.innerHTML = 'ESCUTANDO POR BATIMENTOS'
+                elemento.classList.remove('alert-sucess')
+                elemento.classList.add('alert-warning')
+            }
+        }
+
+        const displayFrequencia = (freq) =>{
+            document.getElementById('frequencia').innerHTML = 'A SUA FREQUENCIA CARDÍACA É: '
+        }
+
+        app()
+
+    </script>
+</body>
+
+</html>
