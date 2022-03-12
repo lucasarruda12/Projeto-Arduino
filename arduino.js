@@ -1,19 +1,14 @@
 const { SerialPort } = require('serialport')
+const { ReadlineParser } = require('@serialport/parser-readline')
 
-const parsers = SerialPort.parsers
-const parser = new parsers.readline({
-    delimiter:"\r\n"
-})
+const portname = 'COM5'
 
 const port = new SerialPort({
-    path:"",
-    baudRate:9600,
-    parity:'none',
-    stopBits:1,
-    flowContent:false
-})
+    path:portname,
+    baudRate:9600
+  });
 
-port.pipe(parser)
+const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }))
 
 parser.on("data", (data)=>{
     console.log(data)
